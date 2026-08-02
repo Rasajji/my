@@ -1,0 +1,428 @@
+/* ==========================================================================
+   RASA — LINK PAGE
+   Design direction: "Signal Ops" — a secure-comms / terminal console aesthetic.
+   Built for a developer who ships encrypted messaging & real-time comms apps.
+   ========================================================================== */
+
+:root{
+  /* -- color tokens -- */
+  --bg:            #0a0c09;
+  --bg-elevated:   #12140e;
+  --surface:       rgba(255, 255, 255, 0.025);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --border:        rgba(255, 176, 0, 0.14);
+  --border-strong: rgba(255, 176, 0, 0.32);
+
+  --text:          #e9e6db;
+  --text-muted:    #8b9082;
+  --text-faint:    #565c4f;
+
+  --accent:        #ffb200;      /* phosphor amber */
+  --accent-dim:    rgba(255, 178, 0, 0.28);
+  --accent-glow:   rgba(255, 178, 0, 0.18);
+
+  --online:        #6fe3a3;      /* status green */
+  --online-dim:    rgba(111, 227, 163, 0.25);
+
+  /* -- type -- */
+  --font-fa:   'Vazirmatn', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* -- layout -- */
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --card-w:    440px;
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{ color-scheme: dark; }
+
+body{
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 18px 48px;
+  position: relative;
+  overflow-x: hidden;
+  perspective: 1200px;
+}
+
+/* لکه‌ی نور که دنبال موس حرکت می‌کنه */
+.cursor-glow{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 480px;
+  margin: -240px 0 0 -240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  will-change: transform;
+}
+
+/* ذرات شناور در پس‌زمینه */
+.particles{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.particle{
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.35;
+  will-change: transform;
+}
+.particle.is-green{ background: var(--online); }
+
+/* ambient radial glow behind the card */
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(560px 420px at 50% 8%, var(--accent-glow), transparent 70%),
+    radial-gradient(480px 360px at 85% 90%, rgba(111,227,163,0.06), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.vignette{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 0 160px 40px rgba(0,0,0,0.65);
+}
+
+/* subtle moving scanline texture — the page's signature ambient detail */
+.scanlines{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.35;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  animation: scan-drift 9s linear infinite;
+}
+@keyframes scan-drift{
+  from{ background-position: 0 0; }
+  to{ background-position: 0 240px; }
+}
+
+/* ==========================================================================
+   CARD
+   ========================================================================== */
+
+.card{
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: var(--card-w);
+  background: linear-gradient(180deg, var(--bg-elevated), var(--bg));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 26px 24px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.4),
+    0 30px 60px -20px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* boot sequence lines (typed via JS/GSAP on load) */
+.boot{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--text-faint);
+  min-height: 38px;
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+  direction: ltr;
+  text-align: left;
+}
+.boot .line{ opacity: 0; display: block; }
+.boot .ok{ color: var(--online); }
+
+/* ==========================================================================
+   PROFILE
+   ========================================================================== */
+
+.profile{
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.avatar-wrap{
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-ring{
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0%, var(--accent) 8%, transparent 22%);
+  opacity: 0.8;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+
+.avatar{
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #1a1d14, #0e0f0a);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--accent);
+  overflow: hidden;
+}
+.avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status-dot{
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--online);
+  border: 3px solid var(--bg-elevated);
+  box-shadow: 0 0 10px var(--online-dim);
+}
+.status-dot::after{
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--online);
+  opacity: 0.6;
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+@keyframes pulse-ring{
+  0%{ transform: scale(0.8); opacity: 0.6; }
+  100%{ transform: scale(1.9); opacity: 0; }
+}
+
+.name{
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  letter-spacing: 0.01em;
+}
+
+.status-line{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  direction: ltr;
+}
+.mono-tag{
+  color: var(--text-faint);
+  letter-spacing: 0.12em;
+}
+.online{
+  color: var(--online);
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.bio{
+  font-size: 14.5px;
+  line-height: 1.9;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0 6px;
+}
+
+/* ==========================================================================
+   LINKS
+   ========================================================================== */
+
+.links{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.link-row{
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.25s ease, background 0.25s ease;
+  will-change: transform;
+}
+
+.link-row::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+.link-row:hover,
+.link-row:focus-visible{
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+.link-row:hover::before,
+.link-row:focus-visible::before{
+  transform: translateX(120%);
+}
+
+.link-row:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.link-icon{
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  will-change: transform;
+}
+.link-icon svg{ width: 18px; height: 18px; }
+
+.link-label{
+  flex: 1 1 auto;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.link-arrow{
+  flex: 0 0 auto;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  transition: color 0.25s ease;
+  will-change: transform;
+}
+.link-row:hover .link-arrow,
+.link-row:focus-visible .link-arrow{
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.footer{
+  text-align: center;
+}
+
+.signal-bars{
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 16px;
+  margin: 0 auto 10px;
+}
+.signal-bars span{
+  width: 4px;
+  height: 100%;
+  background: var(--accent-dim);
+  border-radius: 2px;
+  display: block;
+  transform-origin: bottom center;
+  transform: scaleY(0.3);
+  will-change: transform;
+}
+.signal-bars span:nth-child(4){ background: var(--accent); }
+
+.copyright{
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  direction: ltr;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 380px){
+  .card{ padding: 28px 18px 20px; }
+  .name{ font-size: 21px; }
+}
+
+/* ==========================================================================
+   MOTION PREFERENCE
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce){
+  .scanlines{ animation: none; }
+  .status-dot::after{ animation: none; }
+  .avatar-ring{ animation: none !important; }
+  .cursor-glow, .particles{ display: none; }
+  *{ scroll-behavior: auto !important; }
+}
+
+/* موبایل و تاچ: افکت‌های وابسته به موس (تیلت، نور دنبال‌کننده) بی‌فایده‌ن */
+@media (hover: none){
+  .cursor-glow{ display: none; }
+}
