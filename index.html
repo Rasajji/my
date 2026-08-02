@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>رسا — لینک‌ها</title>
+<meta name="description" content="صفحه بیو و لینک‌های رسا، توسعه‌دهنده فول‌استک." />
+
+<!-- فونت‌ها: وزیرمتن برای فارسی، JetBrains Mono برای المان‌های سیستمی -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- افکت اسکن‌لاین پس‌زمینه — بخشی از هویت بصری صفحه -->
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <main class="card" id="card">
+
+    <!-- خط‌های بوت که موقع لود صفحه با GSAP تایپ می‌شن -->
+    <div class="boot" id="boot" aria-hidden="true"></div>
+
+    <section class="profile">
+      <div class="avatar-wrap" id="avatarWrap">
+        <div class="avatar-ring" aria-hidden="true"></div>
+        <div class="avatar" id="avatar"></div>
+        <span class="status-dot" title="آنلاین"></span>
+      </div>
+
+      <h1 class="name" id="name"></h1>
+
+      <p class="status-line">
+        <span class="mono-tag">STATUS</span>
+        <span class="online" id="statusText"></span>
+      </p>
+
+      <p class="bio" id="bio"></p>
+    </section>
+
+    <nav class="links" id="links" aria-label="لینک‌های ارتباطی"></nav>
+
+    <footer class="footer">
+      <div class="signal-bars" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <p class="copyright">© <span id="year"></span> · ساخته‌شده با GSAP</p>
+    </footer>
+
+  </main>
+
+  <!-- GSAP از CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
